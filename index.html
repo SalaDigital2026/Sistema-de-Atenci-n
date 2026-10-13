@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FUNDANIS - Sistema de Registro con Módulo Conteo</title>
+    <!-- Librería SheetJS para importar y exportar archivos Excel (.xlsx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Iconos Lucide -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 26px;
+            letter-spacing: 1px;
+        }
+
+        /* Navegación por Módulos (Pestañas) */
+        .nav-modules {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #e2e8f0;
+            padding: 6px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+            color: var(--primary);
+        }
+
+        .tab-btn.active {
+            background: var(--card);
+            color: var(--accent);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+        }
+
+        /* Secciones/Módulos */
+        .module-content {
+            display: none;
+        }
+
+        .module-content.active {
+            display: block;
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 16px 0 12px 0;
+            padding-bottom: 4px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #475569;
+        }
+
+        input, select {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+        }
+
+        .alert-found {
+            font-size: 11px;
+            color: #16a34a;
+            font-weight: 600;
+            margin-top: 4px;
+            display: none;
+        }
+
+        /* Selector de Tipo de Visita con Iconos */
+        .visit-type-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .visit-option {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        .visit-option:hover {
+            border-color: var(--accent);
+            background: #eff6ff;
+        }
+
+        .visit-option.selected {
+            border-color: var(--accent);
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .visit-option input[type="radio"] {
+            display: none;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            background: #1d4ed8;
+        }
+
+        .btn-excel {
+            background: #16a34a;
+        }
+
+        .btn-excel:hover {
+            background: #15803d;
+        }
+
+        .btn-import {
+            background: #0284c7;
+        }
+
+        .btn-import:hover {
+            background: #0369a1;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            padding: 6px 10px;
+            font-size: 12px;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-primera { background: #e0e7ff; color: #3730a3; }
+        .badge-frecuente { background: #fef3c7; color: #92400e; }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .counter-badge {
+            background: var(--accent);
+            color: white;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 12px;
+        }
+
+        /* Estilos específicos para el Módulo Conteo */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .stat-card.total-card {
+            background: #eff6ff;
+            border-color: #bfdbfe;
+        }
+
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--accent);
+            margin: 8px 0 4px 0;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #64748b;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>FUNDANIS - SISTEMA DE ATENCIÓN</h1>
+    </header>
+
+    <!-- NAVEGACIÓN ENTRE MÓDULOS -->
+    <div class="nav-modules">
+        <button class="tab-btn active" onclick="switchModule('modulo-registro', this)">
+            <i data-lucide="clipboard-list"></i> Registro
+        </button>
+        <button class="tab-btn" onclick="switchModule('modulo-primera', this)">
+            <i data-lucide="user-plus"></i> Primera Vez <span id="cnt-primera" class="counter-badge">0</span>
+        </button>
+        <button class="tab-btn" onclick="switchModule('modulo-frecuente', this)">
+            <i data-lucide="user-check"></i> Frecuentes <span id="cnt-frecuente" class="counter-badge">0</span>
+        </button>
+        <button class="tab-btn" onclick="switchModule('modulo-departamento', this)">
+            <i data-lucide="building-2"></i> Departamentos
+        </button>
+        <button class="tab-btn" onclick="switchModule('modulo-conteo', this)">
+            <i data-lucide="calculator"></i> Conteo
+        </button>
+    </div>
+
+    <!-- MÓDULO 1: REGISTRO PRINCIPAL -->
+    <div id="modulo-registro" class="module-content active">
+        <!-- Formulario -->
+        <div class="card">
+            <h2>Registro de Atención del Ciudadano</h2>
+            <form id="registroForm">
+                <label>Tipo de Atención:</label>
+                <div class="visit-type-container">
+                    <label class="visit-option selected" id="opt-primera">
+                        <input type="radio" name="tipo_visita" id="radio-primera" value="Primera Vez" checked onclick="selectType('primera')">
+                        <i data-lucide="user-plus"></i> Primera Vez
+                    </label>
+                    <label class="visit-option" id="opt-frecuente">
+                        <input type="radio" name="tipo_visita" id="radio-frecuente" value="Frecuente" onclick="selectType('frecuente')">
+                        <i data-lucide="user-check"></i> Frecuente
+                    </label>
+                </div>
+
+                <!-- DATOS DEL REPRESENTANTE -->
+                <div class="section-title">Datos del Representante</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="cedulaRep">Cédula del Representante *:</label>
+                        <input type="text" id="cedulaRep" required placeholder="Ej: V-12345678" oninput="buscarCiudadano()">
+                        <span id="alertFound" class="alert-found">✓ Representante registrado anteriormente</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="nombreRep">Nombre y Apellido del Representante *:</label>
+                        <input type="text" id="nombreRep" required placeholder="Ej: María Pérez">
+                    </div>
+                    <div class="form-group">
+                        <label for="telefonoRep">Número de Teléfono:</label>
+                        <input type="tel" id="telefonoRep" placeholder="Ej: 0414-1234567">
+                    </div>
+                    <div class="form-group">
+                        <label for="direccionRep">Dirección donde Reside:</label>
+                        <input type="text" id="direccionRep" placeholder="Ej: Av. Principal, Casa Nro. 5">
+                    </div>
+                </div>
+
+                <!-- DATOS DEL NNA (OPCIONALES) -->
+                <div class="section-title">Datos del NNA (Niño, Niña o Adolescente - Opcional)</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nombreNNA">Nombre y Apellido del NNA:</label>
+                        <input type="text" id="nombreNNA" placeholder="Ej: Juan Pérez">
+                    </div>
+                    <div class="form-group">
+                        <label for="edadNNA">Edad:</label>
+                        <input type="number" id="edadNNA" min="0" max="17" placeholder="Ej: 8">
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaNacNNA">Fecha de Nacimiento:</label>
+                        <input type="date" id="fechaNacNNA">
+                    </div>
+                    <div class="form-group">
+                        <label for="cedulaNNA">Cédula de Identidad del NNA:</label>
+                        <input type="text" id="cedulaNNA" placeholder="Ej: V-31234567 (Si aplica)">
+                    </div>
+                </div>
+
+                <!-- DEPARTAMENTO Y SERVICIO -->
+                <div class="section-title">Atención Requerida</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="departamento">Departamento Destino *:</label>
+                        <select id="departamento" required onchange="actualizarServicios('departamento', 'servicio')">
+                            <option value="">-- Seleccionar --</option>
+                            <option value="Salud">Salud</option>
+                            <option value="Defensoría">Defensoría</option>
+                            <option value="Orientación Familiar">Orientación Familiar</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="servicio">Servicio / Área Específica *:</label>
+                        <select id="servicio" required disabled>
+                            <option value="">-- Seleccione Departamento --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn">
+                    <i data-lucide="save"></i> Registrar Atención
+                </button>
+            </form>
+        </div>
+
+        <!-- Tabla General -->
+        <div class="card">
+            <div class="action-bar">
+                <h2>Histórico General de Atenciones</h2>
+                <div class="btn-group">
+                    <input type="file" id="inputExcel" accept=".xlsx, .xls" style="display: none;" onchange="importarExcel(event)">
+                    <button onclick="document.getElementById('inputExcel').click()" class="btn btn-import">
+                        <i data-lucide="upload"></i> Importar Excel
+                    </button>
+                    <button onclick="exportarExcel(registros, 'FUNDANIS_General')" class="btn btn-excel">
+                        <i data-lucide="download"></i> Exportar Todo (.xlsx)
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Tipo</th>
+                            <th>Representante</th>
+                            <th>Cédula Rep.</th>
+                            <th>Teléfono</th>
+                            <th>Dirección</th>
+                            <th>NNA</th>
+                            <th>Edad</th>
+                            <th>Cédula NNA</th>
+                            <th>Departamento</th>
+                            <th>Servicio</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaGeneral"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÓDULO 2: PRIMERA VEZ -->
+    <div id="modulo-primera" class="module-content">
+        <div class="card">
+            <div class="action-bar">
+                <h2>Módulo: Atenciones por Primera Vez</h2>
+                <button onclick="exportarExcel(obtenerRegistrosPorTipo('Primera Vez'), 'FUNDANIS_Primera_Vez')" class="btn btn-excel">
+                    <i data-lucide="download"></i> Exportar Lista (.xlsx)
+                </button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Representante</th>
+                            <th>Cédula Rep.</th>
+                            <th>Teléfono</th>
+                            <th>NNA</th>
+                            <th>Departamento</th>
+                            <th>Servicio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaPrimera"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÓDULO 3: FRECUENTES -->
+    <div id="modulo-frecuente" class="module-content">
+        <div class="card">
+            <div class="action-bar">
+                <h2>Módulo: Atenciones Frecuentes</h2>
+                <button onclick="exportarExcel(obtenerRegistrosPorTipo('Frecuente'), 'FUNDANIS_Frecuentes')" class="btn btn-excel">
+                    <i data-lucide="download"></i> Exportar Lista (.xlsx)
+                </button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Representante</th>
+                            <th>Cédula Rep.</th>
+                            <th>Teléfono</th>
+                            <th>NNA</th>
+                            <th>Departamento</th>
+                            <th>Servicio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaFrecuente"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÓDULO 4: POR DEPARTAMENTO Y SERVICIOS -->
+    <div id="modulo-departamento" class="module-content">
+        <div class="card">
+            <h2>Módulo de Consulta por Departamento y Servicio</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="filtroDpto">Filtrar por Departamento:</label>
+                    <select id="filtroDpto" onchange="actualizarFiltroServicios()">
+                        <option value="">-- Todos los Departamentos --</option>
+                        <option value="Salud">Salud</option>
+                        <option value="Defensoría">Defensoría</option>
+                        <option value="Orientación Familiar">Orientación Familiar</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="filtroServicio">Filtrar por Servicio:</label>
+                    <select id="filtroServicio" onchange="filtrarPorDepartamentoServicio()" disabled>
+                        <option value="">-- Todos los Servicios --</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="action-bar">
+                <h3>Atenciones Registradas en la Selección</h3>
+                <button onclick="exportarExcelFiltrado()" class="btn btn-excel">
+                    <i data-lucide="download"></i> Exportar Selección (.xlsx)
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha/Hora</th>
+                            <th>Tipo</th>
+                            <th>Representante</th>
+                            <th>Cédula Rep.</th>
+                            <th>NNA</th>
+                            <th>Departamento</th>
+                            <th>Servicio</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaDepartamento"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- MÓDULO 5: CONTEO DE PERSONAS POR DEPARTAMENTO -->
+    <div id="modulo-conteo" class="module-content">
+        <div class="card">
+            <div class="action-bar">
+                <h2>Módulo de Conteo y Totales</h2>
+                <button onclick="exportarConteoExcel()" class="btn btn-excel">
+                    <i data-lucide="download"></i> Exportar Informe de Conteo (.xlsx)
+                </button>
+            </div>
+
+            <!-- Resumen en Tarjetas -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Salud</div>
+                    <div class="stat-number" id="cnt-dpto-salud">0</div>
+                    <small>Personas Atendidas</small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Defensoría</div>
+                    <div class="stat-number" id="cnt-dpto-defensoria">0</div>
+                    <small>Personas Atendidas</small>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Orientación Familiar</div>
+                    <div class="stat-number" id="cnt-dpto-orientacion">0</div>
+                    <small>Personas Atendidas</small>
+                </div>
+                <div class="stat-card total-card">
+                    <div class="stat-label">Total General</div>
+                    <div class="stat-number" id="cnt-dpto-total">0</div>
+                    <small>Total Atenciones</small>
+                </div>
+            </div>
+
+            <!-- Tabla Desglosada por Servicio -->
+            <h3>Desglose Estadístico por Servicio</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Departamento</th>
+                            <th>Servicio / Área</th>
+                            <th>Primera Vez</th>
+                            <th>Frecuentes</th>
+                            <th>Total Atendidos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cuerpoTablaConteo"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Inicializar iconos
+    lucide.createIcons();
+
+    // Estructura de servicios actualizada
+    const serviciosPorDepartamento = {
+        "Salud": ["Odontología", "Medicina General", "Nutrición"],
+        "Defensoría": [
+            "Remisiones",
+            "Documento Público",
+            "Incumplimiento de Deberes",
+            "Manutención",
+            "Presentación Extrahospitalaria y Extemporánea"
+        ],
+        "Orientación Familiar": ["Psicología", "Psicopedagogía"]
+    };
+
+    // Arreglo principal de registros
+    let registros = [];
+
+    // Cambiar de módulo (Pestaña)
+    function switchModule(moduleId, btnElement) {
+        document.querySelectorAll('.module-content').forEach(m => m.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+
+        document.getElementById(moduleId).classList.add('active');
+        btnElement.classList.add('active');
+
+        // Actualizar vistas
+        actualizarModuloPrimeraVez();
+        actualizarModuloFrecuentes();
+        filtrarPorDepartamentoServicio();
+        actualizarModuloConteo();
+    }
+
+    // Tipo de visita en formulario
+    function selectType(tipo) {
+        document.getElementById('opt-primera').classList.remove('selected');
+        document.getElementById('opt-frecuente').classList.remove('selected');
+        document.getElementById(`opt-${tipo}`).classList.add('selected');
+        
+        if (tipo === 'primera') {
+            document.getElementById('radio-primera').checked = true;
+        } else {
+            document.getElementById('radio-frecuente').checked = true;
+        }
+    }
+
+    // Autocompletado inteligente por cédula del representante
+    function buscarCiudadano() {
+        const cedulaInput = document.getElementById('cedulaRep').value.trim().toLowerCase();
+        const alertSpan = document.getElementById('alertFound');
+
+        if (cedulaInput === '') {
+            alertSpan.style.display = 'none';
+            return;
+        }
+
+        const ciudadanoEncontrado = registros.slice().reverse().find(r => 
+            r.cedulaRep.toString().trim().toLowerCase().replace(/[-.\s]/g, '') === cedulaInput.replace(/[-.\s]/g, '')
+        );
+
+        if (ciudadanoEncontrado) {
+            document.getElementById('nombreRep').value = ciudadanoEncontrado.nombreRep;
+            document.getElementById('telefonoRep').value = ciudadanoEncontrado.telefonoRep !== 'N/A' ? ciudadanoEncontrado.telefonoRep : '';
+            document.getElementById('direccionRep').value = ciudadanoEncontrado.direccionRep !== 'N/A' ? ciudadanoEncontrado.direccionRep : '';
+            selectType('frecuente');
+            alertSpan.style.display = 'inline';
+        } else {
+            alertSpan.style.display = 'none';
+        }
+    }
+
+    // Actualizar select de servicios dinámicamente
+    function actualizarServicios(idDpto, idServ) {
+        const dptoSelect = document.getElementById(idDpto);
+        const servicioSelect = document.getElementById(idServ);
+        const dptoSeleccionado = dptoSelect.value;
+
+        servicioSelect.innerHTML = '<option value="">-- Seleccionar Servicio --</option>';
+
+        if (dptoSeleccionado && serviciosPorDepartamento[dptoSeleccionado]) {
+            servicioSelect.disabled = false;
+            serviciosPorDepartamento[dptoSeleccionado].forEach(servicio => {
+                const option = document.createElement('option');
+                option.value = servicio;
+                option.textContent = servicio;
+                servicioSelect.appendChild(option);
+            });
+        } else {
+            servicioSelect.disabled = true;
+        }
+    }
+
+    // Guardar nuevo registro
+    document.getElementById('registroForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const ahora = new Date();
+        const fechaHora = ahora.toLocaleString('es-VE');
+
+        const nuevoRegistro = {
+            fecha: fechaHora,
+            tipo: document.querySelector('input[name="tipo_visita"]:checked').value,
+            
+            // Datos del Representante
+            nombreRep: document.getElementById('nombreRep').value.trim(),
+            cedulaRep: document.getElementById('cedulaRep').value.trim(),
+            telefonoRep: document.getElementById('telefonoRep').value.trim() || 'N/A',
+            direccionRep: document.getElementById('direccionRep').value.trim() || 'N/A',
+
+            // Datos del NNA (Opcionales)
+            nombreNNA: document.getElementById('nombreNNA').value.trim() || 'N/A',
+            edadNNA: document.getElementById('edadNNA').value.trim() || 'N/A',
+            fechaNacNNA: document.getElementById('fechaNacNNA').value || 'N/A',
+            cedulaNNA: document.getElementById('cedulaNNA').value.trim() || 'N/A',
+
+            // Atención
+            departamento: document.getElementById('departamento').value,
+            servicio: document.getElementById('servicio').value
+        };
+
+        registros.push(nuevoRegistro);
+        actualizarTodasLasTablas();
+
+        this.reset();
+        document.getElementById('servicio').disabled = true;
+        document.getElementById('alertFound').style.display = 'none';
+        selectType('primera');
+    });
+
+    // Renderizar Tabla General
+    function actualizarTablaGeneral() {
+        const tbody = document.getElementById('cuerpoTablaGeneral');
+        tbody.innerHTML = '';
+
+        registros.forEach((r, index) => {
+            const tr = document.createElement('tr');
+            const badgeClass = r.tipo === 'Primera Vez' ? 'badge-primera' : 'badge-frecuente';
+            
+            tr.innerHTML = `
+                <td>${r.fecha}</td>
+                <td><span class="badge ${badgeClass}">${r.tipo}</span></td>
+                <td>${r.nombreRep}</td>
+                <td>${r.cedulaRep}</td>
+                <td>${r.telefonoRep}</td>
+                <td>${r.direccionRep}</td>
+                <td>${r.nombreNNA}</td>
+                <td>${r.edadNNA}</td>
+                <td>${r.cedulaNNA}</td>
+                <td>${r.departamento}</td>
+                <td>${r.servicio}</td>
+                <td>
+                    <button class="btn btn-danger" onclick="eliminarRegistro(${index})">
+                        <i data-lucide="trash-2"></i>
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        lucide.createIcons();
+    }
+
+    // Módulo Primera Vez
+    function actualizarModuloPrimeraVez() {
+        const lista = obtenerRegistrosPorTipo('Primera Vez');
+        document.getElementById('cnt-primera').textContent = lista.length;
+        const tbody = document.getElementById('cuerpoTablaPrimera');
+        tbody.innerHTML = '';
+
+        lista.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${r.fecha}</td>
+                <td>${r.nombreRep}</td>
+                <td>${r.cedulaRep}</td>
+                <td>${r.telefonoRep}</td>
+                <td>${r.nombreNNA}</td>
+                <td>${r.departamento}</td>
+                <td>${r.servicio}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Módulo Frecuentes
+    function actualizarModuloFrecuentes() {
+        const lista = obtenerRegistrosPorTipo('Frecuente');
+        document.getElementById('cnt-frecuente').textContent = lista.length;
+        const tbody = document.getElementById('cuerpoTablaFrecuente');
+        tbody.innerHTML = '';
+
+        lista.forEach(r => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${r.fecha}</td>
+                <td>${r.nombreRep}</td>
+                <td>${r.cedulaRep}</td>
+                <td>${r.telefonoRep}</td>
+                <td>${r.nombreNNA}</td>
+                <td>${r.departamento}</td>
+                <td>${r.servicio}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Módulo Departamento/Servicio
+    function actualizarFiltroServicios() {
+        actualizarServicios('filtroDpto', 'filtroServicio');
+        filtrarPorDepartamentoServicio();
+    }
+
+    function obtenerRegistrosFiltradosDpto() {
+        const dpto = document.getElementById('filtroDpto').value;
+        const serv = document.getElementById('filtroServicio').value;
+
+        return registros.filter(r => {
+            const coincideDpto = dpto === '' || r.departamento === dpto;
+            const coincideServ = serv === '' || r.servicio === serv;
+            return coincideDpto && coincideServ;
+        });
+    }
+
+    function filtrarPorDepartamentoServicio() {
+        const lista = obtenerRegistrosFiltradosDpto();
+        const tbody = document.getElementById('cuerpoTablaDepartamento');
+        tbody.innerHTML = '';
+
+        lista.forEach(r => {
+            const tr = document.createElement('tr');
+            const badgeClass = r.tipo === 'Primera Vez' ? 'badge-primera' : 'badge-frecuente';
+            tr.innerHTML = `
+                <td>${r.fecha}</td>
+                <td><span class="badge ${badgeClass}">${r.tipo}</span></td>
+                <td>${r.nombreRep}</td>
+                <td>${r.cedulaRep}</td>
+                <td>${r.nombreNNA}</td>
+                <td>${r.departamento}</td>
+                <td>${r.servicio}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // MÓDULO CONTEO DE PERSONAS POR DEPARTAMENTO Y SERVICIO
+    function actualizarModuloConteo() {
+        let conteoSalud = 0;
+        let conteoDefensoria = 0;
+        let conteoOrientacion = 0;
+
+        // Calcular totales generales por departamento
+        registros.forEach(r => {
+            if (r.departamento === 'Salud') conteoSalud++;
+            else if (r.departamento === 'Defensoría') conteoDefensoria++;
+            else if (r.departamento === 'Orientación Familiar') conteoOrientacion++;
+        });
+
+        document.getElementById('cnt-dpto-salud').textContent = conteoSalud;
+        document.getElementById('cnt-dpto-defensoria').textContent = conteoDefensoria;
+        document.getElementById('cnt-dpto-orientacion').textContent = conteoOrientacion;
+        document.getElementById('cnt-dpto-total').textContent = registros.length;
+
+        // Construir tabla desglosada por servicios
+        const tbody = document.getElementById('cuerpoTablaConteo');
+        tbody.innerHTML = '';
+
+        Object.keys(serviciosPorDepartamento).forEach(dpto => {
+            serviciosPorDepartamento[dpto].forEach(servicio => {
+                const atencionesServicio = registros.filter(r => r.departamento === dpto && r.servicio === servicio);
+                const primeraVezCount = atencionesServicio.filter(r => r.tipo === 'Primera Vez').length;
+                const frecuenteCount = atencionesServicio.filter(r => r.tipo === 'Frecuente').length;
+                const totalCount = atencionesServicio.length;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${dpto}</strong></td>
+                    <td>${servicio}</td>
+                    <td>${primeraVezCount}</td>
+                    <td>${frecuenteCount}</td>
+                    <td><strong>${totalCount}</strong></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+    }
+
+    function exportarConteoExcel() {
+        const datosConteo = [];
+
+        Object.keys(serviciosPorDepartamento).forEach(dpto => {
+            serviciosPorDepartamento[dpto].forEach(servicio => {
+                const atencionesServicio = registros.filter(r => r.departamento === dpto && r.servicio === servicio);
+                const primeraVezCount = atencionesServicio.filter(r => r.tipo === 'Primera Vez').length;
+                const frecuenteCount = atencionesServicio.filter(r => r.tipo === 'Frecuente').length;
+
+                datosConteo.push({
+                    'Departamento': dpto,
+                    'Servicio': servicio,
+                    'Primera Vez': primeraVezCount,
+                    'Frecuentes': frecuenteCount,
+                    'Total Atendidos': atencionesServicio.length
+                });
+            });
+        });
+
+        const worksheet = XLSX.utils.json_to_sheet(datosConteo);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Conteo_Atenciones");
+
+        const fechaActual = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(workbook, `FUNDANIS_Conteo_Totales_${fechaActual}.xlsx`);
+    }
+
+    function obtenerRegistrosPorTipo(tipo) {
+        return registros.filter(r => r.tipo === tipo);
+    }
+
+    function actualizarTodasLasTablas() {
+        actualizarTablaGeneral();
+        actualizarModuloPrimeraVez();
+        actualizarModuloFrecuentes();
+        filtrarPorDepartamentoServicio();
+        actualizarModuloConteo();
+    }
+
+    function eliminarRegistro(index) {
+        registros.splice(index, 1);
+        actualizarTodasLasTablas();
+    }
+
+    // Exportar Excel de listas
+    function exportarExcel(data, nombreArchivo) {
+        if (data.length === 0) {
+            alert('No hay registros en este módulo para exportar.');
+            return;
+        }
+
+        const datosExcel = data.map(r => ({
+            'Fecha y Hora': r.fecha,
+            'Tipo de Atención': r.tipo,
+            'Nombre del Representante': r.nombreRep,
+            'Cédula del Representante': r.cedulaRep,
+            'Teléfono': r.telefonoRep,
+            'Dirección': r.direccionRep,
+            'Nombre del NNA': r.nombreNNA,
+            'Edad NNA': r.edadNNA,
+            'Fecha Nacimiento NNA': r.fechaNacNNA,
+            'Cédula del NNA': r.cedulaNNA,
+            'Departamento': r.departamento,
+            'Servicio Requerido': r.servicio
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(datosExcel);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Atenciones");
+
+        const fechaActual = new Date().toISOString().split('T')[0];
+        XLSX.writeFile(workbook, `${nombreArchivo}_${fechaActual}.xlsx`);
+    }
+
+    function exportarExcelFiltrado() {
+        const lista = obtenerRegistrosFiltradosDpto();
+        exportarExcel(lista, 'FUNDANIS_Departamento_Servicio');
+    }
+
+    // Importar Excel
+    function importarExcel(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+            
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const json = XLSX.utils.sheet_to_json(worksheet);
+
+            if (json.length === 0) {
+                alert('El archivo Excel seleccionado está vacío.');
+                return;
+            }
+
+            const registrosImportados = json.map(row => ({
+                fecha: row['Fecha y Hora'] || row['fecha'] || new Date().toLocaleString('es-VE'),
+                tipo: row['Tipo de Atención'] || row['tipo'] || 'Primera Vez',
+                nombreRep: String(row['Nombre del Representante'] || row['nombreRep'] || row['Nombre'] || 'Sin Nombre').trim(),
+                cedulaRep: String(row['Cédula del Representante'] || row['cedulaRep'] || row['Cedula'] || 'N/A').trim(),
+                telefonoRep: String(row['Teléfono'] || row['telefonoRep'] || 'N/A').trim(),
+                direccionRep: String(row['Dirección'] || row['direccionRep'] || 'N/A').trim(),
+                nombreNNA: String(row['Nombre del NNA'] || row['nombreNNA'] || 'N/A').trim(),
+                edadNNA: String(row['Edad NNA'] || row['edadNNA'] || 'N/A').trim(),
+                fechaNacNNA: String(row['Fecha Nacimiento NNA'] || row['fechaNacNNA'] || 'N/A').trim(),
+                cedulaNNA: String(row['Cédula del NNA'] || row['cedulaNNA'] || 'N/A').trim(),
+                departamento: row['Departamento'] || row['departamento'] || 'N/A',
+                servicio: row['Servicio Requerido'] || row['servicio'] || 'N/A'
+            }));
+
+            registros = registros.concat(registrosImportados);
+            actualizarTodasLasTablas();
+
+            alert(`Se importaron ${registrosImportados.length} registros exitosamente.`);
+            event.target.value = '';
+        };
+
+        reader.readAsArrayBuffer(file);
+    }
+</script>
+
+</body>
+</html>
