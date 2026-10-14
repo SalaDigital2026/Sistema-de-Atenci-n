@@ -1,0 +1,12 @@
+name = "sistemadeatencion"
+main = "worker.js"
+compatibility_date = "2024-09-23"
+
+[assets]
+directory = "."
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "fundanis-db"
+database_id = "PEGA_AQUI_EL_ID_DE_TU_BASE_DE_DATOS_D1"
