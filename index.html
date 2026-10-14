@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FUNDANIS - Sistema de Registro</title>
-    <!-- SheetJS y Lucide -->
+    <!-- SheetJS y Lucide Icons -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -216,7 +216,41 @@
         }
         input:focus { border-color: var(--accent); }
 
-        /* --- GADGET PERSONALIZADO PARA SELECTS CON FLECHAS --- */
+        /* --- ICONOS DE SELECCIÓN RÁPIDA DE DEPARTAMENTO --- */
+        .dept-quick-icons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .dept-pill {
+            background: #f1f5f9;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 7px 14px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .dept-pill:hover {
+            background: #e2e8f0;
+            border-color: var(--accent);
+        }
+
+        .dept-pill.active {
+            background: #eff6ff;
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        /* --- GADGET DE SELECCIÓN CON FLECHA --- */
         .select-gadget {
             position: relative;
             display: flex;
@@ -270,13 +304,101 @@
             background: #eff6ff;
             border-radius: 6px;
             color: var(--accent);
-            transition: transform 0.2s ease, background-color 0.2s;
+            transition: transform 0.2s ease;
         }
 
         .select-gadget select:disabled ~ .gadget-arrow {
             background: #e2e8f0;
             color: #94a3b8;
         }
+
+        /* --- BANDEJA DE SERVICIOS MÚLTIPLES --- */
+        .servicios-multiples-box {
+            background: #eff6ff;
+            border: 2px dashed #93c5fd;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 20px;
+        }
+
+        .servicios-multiples-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e40af;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 10px;
+        }
+
+        .chips-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .service-chip {
+            background: white;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 6px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            font-size: 13px;
+        }
+
+        .chip-dpto {
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chip-serv {
+            color: #1e293b;
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .chip-remove {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1;
+            transition: background 0.2s;
+        }
+
+        .chip-remove:hover { background: #fca5a5; }
+
+        .btn-add-more {
+            background: #0284c7;
+            color: white;
+            padding: 9px 16px;
+            font-size: 13px;
+            border-radius: 6px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .btn-add-more:hover { background: #0369a1; }
 
         .alert-found { font-size: 11px; color: #16a34a; font-weight: 600; margin-top: 4px; display: none; }
 
@@ -487,13 +609,32 @@
                     </div>
                 </div>
 
-                <!-- ATENCIÓN REQUERIDA CON GADGETS DE SELECCIÓN -->
-                <div class="section-title">Atención Requerida</div>
+                <!-- ATENCIÓN REQUERIDA (SELECCIÓN SIMPLE O MÚLTIPLE CON ICONOS) -->
+                <div class="section-title">Atención Requerida (Puede seleccionar uno o más departamentos)</div>
+
+                <!-- Iconos de selección rápida -->
+                <label>Selección rápida por Departamento:</label>
+                <div class="dept-quick-icons">
+                    <button type="button" class="dept-pill" data-dpto="Salud" onclick="seleccionarDptoRapido('Salud')">
+                        <i data-lucide="activity"></i> Salud
+                    </button>
+                    <button type="button" class="dept-pill" data-dpto="Defensoría" onclick="seleccionarDptoRapido('Defensoría')">
+                        <i data-lucide="shield"></i> Defensoría
+                    </button>
+                    <button type="button" class="dept-pill" data-dpto="Orientación Familiar" onclick="seleccionarDptoRapido('Orientación Familiar')">
+                        <i data-lucide="users"></i> Orientación Familiar
+                    </button>
+                    <button type="button" class="dept-pill" data-dpto="Atención" onclick="seleccionarDptoRapido('Atención')">
+                        <i data-lucide="info"></i> Atención
+                    </button>
+                </div>
+
+                <!-- Menús desplegables con gadgets -->
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="departamento">Departamento Destino *:</label>
                         <div class="select-gadget">
-                            <select id="departamento" required onchange="actualizarServicios('departamento', 'servicio')">
+                            <select id="departamento" onchange="actualizarServicios('departamento', 'servicio')">
                                 <option value="">-- Seleccionar Departamento --</option>
                                 <option value="Salud">Salud</option>
                                 <option value="Defensoría">Defensoría</option>
@@ -508,7 +649,7 @@
                     <div class="form-group">
                         <label for="servicio">Servicio / Área *:</label>
                         <div class="select-gadget">
-                            <select id="servicio" required disabled>
+                            <select id="servicio" disabled>
                                 <option value="">-- Seleccione Departamento --</option>
                             </select>
                             <div class="gadget-arrow">
@@ -516,6 +657,22 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Botón para añadir múltiples servicios a la misma persona -->
+                <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                    <button type="button" class="btn-add-more" onclick="agregarServicioALista()">
+                        <i data-lucide="plus-circle"></i> + Añadir a la visita
+                    </button>
+                    <small style="color: #64748b;">(Úsalo si la persona va a más de un departamento o servicio en esta visita)</small>
+                </div>
+
+                <!-- Bandeja de servicios acumulados -->
+                <div id="contenedor-servicios-multiples" class="servicios-multiples-box" style="display: none;">
+                    <div class="servicios-multiples-title">
+                        <i data-lucide="list-checks"></i> Departamentos y Servicios seleccionados para esta visita:
+                    </div>
+                    <div id="lista-chips-servicios" class="chips-container"></div>
                 </div>
 
                 <!-- BOTÓN GUARDAR -->
@@ -734,7 +891,85 @@
         "Atención": ["Información", "Entrega Curricular", "Otras Atenciones"]
     };
 
+    const iconosPorDepartamento = {
+        "Salud": "activity",
+        "Defensoría": "shield",
+        "Orientación Familiar": "users",
+        "Atención": "info"
+    };
+
     let registros = [];
+    let serviciosSeleccionadosVisita = [];
+
+    // --- SELECCIÓN RÁPIDA Y MULTISERVICIOS ---
+    function seleccionarDptoRapido(dpto) {
+        const selDpto = document.getElementById('departamento');
+        selDpto.value = dpto;
+        actualizarServicios('departamento', 'servicio');
+
+        document.querySelectorAll('.dept-pill').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-dpto') === dpto);
+        });
+
+        document.getElementById('servicio').focus();
+    }
+
+    function agregarServicioALista() {
+        const dpto = document.getElementById('departamento').value;
+        const serv = document.getElementById('servicio').value;
+
+        if (!dpto || !serv) {
+            alert('Por favor selecciona primero un Departamento y un Servicio en los menús desplegables.');
+            return;
+        }
+
+        const existe = serviciosSeleccionadosVisita.some(item => item.departamento === dpto && item.servicio === serv);
+        if (existe) {
+            alert('Este servicio ya ha sido añadido a la lista de la visita.');
+            return;
+        }
+
+        serviciosSeleccionadosVisita.push({ departamento: dpto, servicio: serv });
+        renderizarChipsServicios();
+
+        // Limpiar para permitir elegir otro departamento si lo desea
+        document.getElementById('departamento').value = '';
+        actualizarServicios('departamento', 'servicio');
+        document.querySelectorAll('.dept-pill').forEach(btn => btn.classList.remove('active'));
+    }
+
+    function quitarServicio(index) {
+        serviciosSeleccionadosVisita.splice(index, 1);
+        renderizarChipsServicios();
+    }
+
+    function renderizarChipsServicios() {
+        const contenedor = document.getElementById('contenedor-servicios-multiples');
+        const lista = document.getElementById('lista-chips-servicios');
+
+        if (serviciosSeleccionadosVisita.length === 0) {
+            contenedor.style.display = 'none';
+            lista.innerHTML = '';
+            return;
+        }
+
+        contenedor.style.display = 'block';
+        lista.innerHTML = '';
+
+        serviciosSeleccionadosVisita.forEach((item, index) => {
+            const iconName = iconosPorDepartamento[item.departamento] || 'tag';
+            const chip = document.createElement('div');
+            chip.className = 'service-chip';
+            chip.innerHTML = `
+                <span class="chip-dpto"><i data-lucide="${iconName}" style="width: 14px; height: 14px;"></i> ${item.departamento}</span>
+                <span class="chip-serv">${item.servicio}</span>
+                <button type="button" class="chip-remove" onclick="quitarServicio(${index})" title="Quitar servicio">×</button>
+            `;
+            lista.appendChild(chip);
+        });
+
+        lucide.createIcons();
+    }
 
     // --- AUTENTICACIÓN ---
     function mostrarMensajeAuth(texto, esExito = false) {
@@ -854,7 +1089,6 @@
         await cargarRegistrosDesdeCloudflare();
     }
 
-    // --- CARGA Y SINCRONIZACIÓN DE DATOS ---
     async function cargarRegistrosDesdeCloudflare() {
         try {
             const res = await fetch('/api/registros');
@@ -867,10 +1101,34 @@
         }
     }
 
+    // --- GUARDAR ATENCIÓN (SOPORTA 1 O MÚLTIPLES SERVICIOS) ---
     document.getElementById('registroForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        const nuevoRegistro = {
+        let atencionesAGuardar = [];
+
+        // Si se añadieron a la lista de servicios múltiples
+        if (serviciosSeleccionadosVisita.length > 0) {
+            atencionesAGuardar = [...serviciosSeleccionadosVisita];
+
+            // Si además tiene una selección en el dropdown que no haya pulsado "+ Añadir", la incluimos
+            const dptoActual = document.getElementById('departamento').value;
+            const servActual = document.getElementById('servicio').value;
+            if (dptoActual && servActual && !atencionesAGuardar.some(a => a.departamento === dptoActual && a.servicio === servActual)) {
+                atencionesAGuardar.push({ departamento: dptoActual, servicio: servActual });
+            }
+        } else {
+            // Modo tradicional de un solo departamento
+            const dpto = document.getElementById('departamento').value;
+            const serv = document.getElementById('servicio').value;
+            if (!dpto || !serv) {
+                alert('Por favor selecciona el Departamento y Servicio requerido.');
+                return;
+            }
+            atencionesAGuardar.push({ departamento: dpto, servicio: serv });
+        }
+
+        const datosComunes = {
             fecha: new Date().toLocaleString('es-VE'),
             tipo: document.querySelector('input[name="tipo_visita"]:checked').value,
             nombreRep: document.getElementById('nombreRep').value.trim(),
@@ -880,33 +1138,52 @@
             nombreNNA: document.getElementById('nombreNNA').value.trim() || 'N/A',
             edadNNA: document.getElementById('edadNNA').value.trim() || 'N/A',
             fechaNacNNA: document.getElementById('fechaNacNNA').value || 'N/A',
-            cedulaNNA: document.getElementById('cedulaNNA').value.trim() || 'N/A',
-            departamento: document.getElementById('departamento').value,
-            servicio: document.getElementById('servicio').value
+            cedulaNNA: document.getElementById('cedulaNNA').value.trim() || 'N/A'
         };
 
-        try {
-            const res = await fetch('/api/registros', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(nuevoRegistro)
-            });
-            const data = await res.json();
+        let guardados = 0;
 
-            if (res.ok) {
-                nuevoRegistro.id = data.id;
-                registros.unshift(nuevoRegistro);
-                actualizarTodasLasTablas();
+        for (const atencion of atencionesAGuardar) {
+            const nuevoRegistro = {
+                ...datosComunes,
+                departamento: atencion.departamento,
+                servicio: atencion.servicio
+            };
 
-                this.reset();
-                document.getElementById('servicio').disabled = true;
-                document.getElementById('alertFound').style.display = 'none';
-                document.getElementById('alertFoundNNA').style.display = 'none';
-                selectType('primera');
-                alert('¡Atención guardada exitosamente!');
+            try {
+                const res = await fetch('/api/registros', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nuevoRegistro)
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    nuevoRegistro.id = data.id;
+                    registros.unshift(nuevoRegistro);
+                    guardados++;
+                }
+            } catch (err) {
+                console.error("Error guardando registro:", err);
             }
-        } catch (err) {
-            alert('Error al guardar el registro.');
+        }
+
+        if (guardados > 0) {
+            actualizarTodasLasTablas();
+            this.reset();
+            serviciosSeleccionadosVisita = [];
+            renderizarChipsServicios();
+
+            document.getElementById('servicio').disabled = true;
+            document.getElementById('alertFound').style.display = 'none';
+            document.getElementById('alertFoundNNA').style.display = 'none';
+            document.querySelectorAll('.dept-pill').forEach(btn => btn.classList.remove('active'));
+            selectType('primera');
+
+            alert(guardados === 1 
+                ? '¡Atención guardada exitosamente!' 
+                : `¡Se guardaron ${guardados} atenciones para el ciudadano exitosamente!`);
+        } else {
+            alert('Ocurrió un error al guardar en la base de datos.');
         }
     });
 
