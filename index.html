@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FUNDANIS - Sistema de Registro (Cloudflare Pages)</title>
+    <title>FUNDANIS - Sistema de Registro</title>
     <!-- SheetJS y Lucide -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -14,7 +14,7 @@
             --bg: #f8fafc;
             --card: #ffffff;
             --text: #1e293b;
-            --border: #e2e8f0;
+            --border: #cbd5e1;
         }
 
         body {
@@ -205,12 +205,77 @@
 
         .form-group { display: flex; flex-direction: column; }
         label { font-size: 13px; font-weight: 600; margin-bottom: 6px; color: #475569; }
-        input, select {
+        
+        input {
             padding: 10px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 14px;
             outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus { border-color: var(--accent); }
+
+        /* --- GADGET PERSONALIZADO PARA SELECTS CON FLECHAS --- */
+        .select-gadget {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .select-gadget select {
+            width: 100%;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            padding: 11px 42px 11px 14px;
+            background-color: #ffffff;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .select-gadget select:hover:not(:disabled) {
+            border-color: var(--accent);
+            background-color: #f8fafc;
+        }
+
+        .select-gadget select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+
+        .select-gadget select:disabled {
+            background-color: #f1f5f9;
+            cursor: not-allowed;
+            color: #94a3b8;
+            border-color: #e2e8f0;
+        }
+
+        .gadget-arrow {
+            position: absolute;
+            right: 10px;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: #eff6ff;
+            border-radius: 6px;
+            color: var(--accent);
+            transition: transform 0.2s ease, background-color 0.2s;
+        }
+
+        .select-gadget select:disabled ~ .gadget-arrow {
+            background: #e2e8f0;
+            color: #94a3b8;
         }
 
         .alert-found { font-size: 11px; color: #16a34a; font-weight: 600; margin-top: 4px; display: none; }
@@ -235,19 +300,23 @@
             background: var(--accent);
             color: white;
             border: none;
-            padding: 10px 18px;
-            border-radius: 6px;
-            font-weight: 600;
+            padding: 11px 22px;
+            border-radius: 8px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
             cursor: pointer;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
             font-size: 14px;
+            transition: all 0.2s;
         }
+        .btn:hover { background: #1d4ed8; }
         .btn-excel { background: #16a34a; }
+        .btn-excel:hover { background: #15803d; }
         .btn-import { background: #0284c7; }
-        .btn-danger { background: #ef4444; padding: 6px 10px; font-size: 12px; }
+        .btn-danger { background: #ef4444; padding: 6px 10px; font-size: 12px; border-radius: 6px; }
 
         .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
@@ -275,10 +344,10 @@
 <div id="auth-screen">
     <div class="auth-card">
         <div class="auth-icon">
-            <i data-lucide="cloud" style="width: 32px; height: 32px;"></i>
+            <i data-lucide="shield-check" style="width: 32px; height: 32px;"></i>
         </div>
         <h2>Acceso Administrativo</h2>
-        <p>FUNDANIS - Conectado a Cloudflare D1</p>
+        <p>FUNDANIS - Sistema de Registro</p>
 
         <div class="auth-tabs">
             <button class="auth-tab-btn active" id="tab-login" onclick="cambiarVistaAuth('login')">Iniciar Sesión</button>
@@ -330,10 +399,10 @@
 <!-- APLICACIÓN PRINCIPAL -->
 <div id="app-container">
     <header>
-        <h1>FUNDANIS - SISTEMA DE ATENCIÓN (CLOUDFLARE)</h1>
+        <h1>FUNDANIS - SISTEMA DE ATENCIÓN</h1>
         <div class="admin-header-actions">
             <div class="admin-badge">
-                <i data-lucide="database"></i> <span id="admin-user-display">Usuario</span>
+                <i data-lucide="user"></i> <span id="admin-user-display">Usuario</span>
             </div>
             <button onclick="cerrarSesion()" class="btn-logout">
                 <i data-lucide="log-out"></i> Salir
@@ -418,28 +487,40 @@
                     </div>
                 </div>
 
+                <!-- ATENCIÓN REQUERIDA CON GADGETS DE SELECCIÓN -->
                 <div class="section-title">Atención Requerida</div>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="departamento">Departamento Destino *:</label>
-                        <select id="departamento" required onchange="actualizarServicios('departamento', 'servicio')">
-                            <option value="">-- Seleccionar --</option>
-                            <option value="Salud">Salud</option>
-                            <option value="Defensoría">Defensoría</option>
-                            <option value="Orientación Familiar">Orientación Familiar</option>
-                            <option value="Atención">Atención</option>
-                        </select>
+                        <div class="select-gadget">
+                            <select id="departamento" required onchange="actualizarServicios('departamento', 'servicio')">
+                                <option value="">-- Seleccionar Departamento --</option>
+                                <option value="Salud">Salud</option>
+                                <option value="Defensoría">Defensoría</option>
+                                <option value="Orientación Familiar">Orientación Familiar</option>
+                                <option value="Atención">Atención</option>
+                            </select>
+                            <div class="gadget-arrow">
+                                <i data-lucide="chevron-down"></i>
+                            </div>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label for="servicio">Servicio / Área *:</label>
-                        <select id="servicio" required disabled>
-                            <option value="">-- Seleccione Departamento --</option>
-                        </select>
+                        <div class="select-gadget">
+                            <select id="servicio" required disabled>
+                                <option value="">-- Seleccione Departamento --</option>
+                            </select>
+                            <div class="gadget-arrow">
+                                <i data-lucide="chevron-down"></i>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
+                <!-- BOTÓN GUARDAR -->
                 <button type="submit" class="btn">
-                    <i data-lucide="cloud-upload"></i> Guardar en Cloudflare D1
+                    <i data-lucide="save"></i> GUARDAR
                 </button>
             </form>
         </div>
@@ -545,19 +626,29 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="filtroDpto">Departamento:</label>
-                    <select id="filtroDpto" onchange="actualizarFiltroServicios()">
-                        <option value="">-- Todos --</option>
-                        <option value="Salud">Salud</option>
-                        <option value="Defensoría">Defensoría</option>
-                        <option value="Orientación Familiar">Orientación Familiar</option>
-                        <option value="Atención">Atención</option>
-                    </select>
+                    <div class="select-gadget">
+                        <select id="filtroDpto" onchange="actualizarFiltroServicios()">
+                            <option value="">-- Todos los Departamentos --</option>
+                            <option value="Salud">Salud</option>
+                            <option value="Defensoría">Defensoría</option>
+                            <option value="Orientación Familiar">Orientación Familiar</option>
+                            <option value="Atención">Atención</option>
+                        </select>
+                        <div class="gadget-arrow">
+                            <i data-lucide="chevron-down"></i>
+                        </div>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="filtroServicio">Servicio:</label>
-                    <select id="filtroServicio" onchange="filtrarPorDepartamentoServicio()" disabled>
-                        <option value="">-- Todos --</option>
-                    </select>
+                    <div class="select-gadget">
+                        <select id="filtroServicio" onchange="filtrarPorDepartamentoServicio()" disabled>
+                            <option value="">-- Todos los Servicios --</option>
+                        </select>
+                        <div class="gadget-arrow">
+                            <i data-lucide="chevron-down"></i>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -645,7 +736,7 @@
 
     let registros = [];
 
-    // --- AUTENTICACIÓN Y CONEXIÓN CON CLOUDFLARE ---
+    // --- AUTENTICACIÓN ---
     function mostrarMensajeAuth(texto, esExito = false) {
         const box = document.getElementById('auth-msg');
         box.textContent = texto;
@@ -699,14 +790,14 @@
                 return;
             }
 
-            mostrarMensajeAuth('¡Usuario registrado con éxito en Cloudflare D1!', true);
+            mostrarMensajeAuth('¡Usuario registrado con éxito!', true);
             document.getElementById('form-register').reset();
             setTimeout(() => {
                 cambiarVistaAuth('login');
                 document.getElementById('login-user').value = user;
             }, 1200);
         } catch (err) {
-            mostrarMensajeAuth('Error de conexión con Cloudflare.');
+            mostrarMensajeAuth('Error de conexión con el servidor.');
         }
     }
 
@@ -732,7 +823,7 @@
             sessionStorage.setItem('fundanis_user', data.user.nombre || data.user.user);
             mostrarSistema();
         } catch (err) {
-            mostrarMensajeAuth('Error conectando a la API de Cloudflare.');
+            mostrarMensajeAuth('Error conectando con el servidor.');
         }
     }
 
@@ -744,7 +835,6 @@
     }
 
     async function verificarSesion() {
-        // Inicializar tablas en Cloudflare de forma transparente
         fetch('/api/setup').catch(() => {});
 
         if (sessionStorage.getItem('fundanis_logged') === 'true') {
@@ -813,10 +903,10 @@
                 document.getElementById('alertFound').style.display = 'none';
                 document.getElementById('alertFoundNNA').style.display = 'none';
                 selectType('primera');
-                alert('¡Atención guardada exitosamente en Cloudflare D1!');
+                alert('¡Atención guardada exitosamente!');
             }
         } catch (err) {
-            alert('Error guardando en la base de datos.');
+            alert('Error al guardar el registro.');
         }
     });
 
@@ -834,7 +924,6 @@
         }
     }
 
-    // Funciones del formulario
     function calcularEdadDesdeFecha() {
         const fechaNac = new Date(document.getElementById('fechaNacNNA').value);
         if (isNaN(fechaNac)) return;
@@ -864,8 +953,8 @@
 
     function buscarNNA() {
         const ci = document.getElementById('cedulaNNA').value.trim().toLowerCase().replace(/[-.\s]/g, '');
-        const alertSpan = document.getElementById('alertFoundNNA');
-        if (!ci) { alertSpan.style.display = 'none'; return; }
+        const alertSpanNNA = document.getElementById('alertFoundNNA');
+        if (!ci) { alertSpanNNA.style.display = 'none'; return; }
 
         const found = registros.find(r => r.cedulaNNA && r.cedulaNNA !== 'N/A' && r.cedulaNNA.toString().toLowerCase().replace(/[-.\s]/g, '') === ci);
         if (found) {
@@ -876,9 +965,9 @@
             } else if (found.edadNNA && found.edadNNA !== 'N/A') {
                 document.getElementById('edadNNA').value = found.edadNNA;
             }
-            alertSpan.style.display = 'inline';
+            alertSpanNNA.style.display = 'inline';
         } else {
-            alertSpan.style.display = 'none';
+            alertSpanNNA.style.display = 'none';
         }
     }
 
