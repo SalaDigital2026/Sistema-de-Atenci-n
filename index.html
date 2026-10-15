@@ -880,6 +880,7 @@
 </div>
 
 <script>
+    // --- ESTRUCTURA ACTUALIZADA CON "Escuela para Padres" ---
     const serviciosPorDepartamento = {
         "Salud": ["Odontología", "Medicina General", "Nutrición"],
         "Defensoría": [
@@ -887,7 +888,7 @@
             "Manutención", "Presentación Extrahospitalaria", "Presentación Extemporánea",
             "Lazos Familiares", "Régimen de Convivencia"
         ],
-        "Orientación Familiar": ["Psicología", "Psicopedagogía"],
+        "Orientación Familiar": ["Psicología", "Psicopedagogía", "Escuela para Padres"],
         "Atención": ["Información", "Entrega Curricular", "Otras Atenciones"]
     };
 
@@ -1107,18 +1108,15 @@
 
         let atencionesAGuardar = [];
 
-        // Si se añadieron a la lista de servicios múltiples
         if (serviciosSeleccionadosVisita.length > 0) {
             atencionesAGuardar = [...serviciosSeleccionadosVisita];
 
-            // Si además tiene una selección en el dropdown que no haya pulsado "+ Añadir", la incluimos
             const dptoActual = document.getElementById('departamento').value;
             const servActual = document.getElementById('servicio').value;
             if (dptoActual && servActual && !atencionesAGuardar.some(a => a.departamento === dptoActual && a.servicio === servActual)) {
                 atencionesAGuardar.push({ departamento: dptoActual, servicio: servActual });
             }
         } else {
-            // Modo tradicional de un solo departamento
             const dpto = document.getElementById('departamento').value;
             const serv = document.getElementById('servicio').value;
             if (!dpto || !serv) {
