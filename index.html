@@ -3,6 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <title>FUNDANIS - Sistema de Registro</title>
     <!-- SheetJS y Lucide Icons -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -216,7 +219,6 @@
         }
         input:focus { border-color: var(--accent); }
 
-        /* --- SELECCIÓN RÁPIDA --- */
         .dept-quick-icons {
             display: flex;
             flex-wrap: wrap;
@@ -242,7 +244,6 @@
         .dept-pill:hover { background: #e2e8f0; border-color: var(--accent); }
         .dept-pill.active { background: #eff6ff; border-color: var(--accent); color: var(--accent); }
 
-        /* --- GADGET DE SELECCIÓN CON FLECHA --- */
         .select-gadget {
             position: relative;
             display: flex;
@@ -296,15 +297,8 @@
             background: #eff6ff;
             border-radius: 6px;
             color: var(--accent);
-            transition: transform 0.2s ease;
         }
 
-        .select-gadget select:disabled ~ .gadget-arrow {
-            background: #e2e8f0;
-            color: #94a3b8;
-        }
-
-        /* --- BANDEJA MULTISERVICIOS --- */
         .servicios-multiples-box {
             background: #eff6ff;
             border: 2px dashed #93c5fd;
@@ -483,14 +477,7 @@
         }
 
         .modal-header h3 { margin: 0; color: var(--primary); display: flex; align-items: center; gap: 8px; }
-
-        .btn-close-modal {
-            background: transparent;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: #64748b;
-        }
+        .btn-close-modal { background: transparent; border: none; font-size: 20px; cursor: pointer; color: #64748b; }
     </style>
 </head>
 <body>
@@ -511,7 +498,6 @@
 
         <div id="auth-msg" class="msg-box"></div>
 
-        <!-- LOGIN -->
         <form id="form-login" class="auth-form" onsubmit="iniciarSesion(event)">
             <div class="form-group">
                 <label for="login-user">Usuario:</label>
@@ -526,7 +512,6 @@
             </button>
         </form>
 
-        <!-- REGISTRO -->
         <form id="form-register" class="auth-form" style="display: none;" onsubmit="registrarUsuario(event)">
             <div class="form-group">
                 <label for="reg-nombre">Nombre y Apellido:</label>
@@ -645,7 +630,6 @@
                 <!-- ATENCIÓN REQUERIDA -->
                 <div class="section-title">Atención Requerida (Puede seleccionar uno o más departamentos)</div>
 
-                <!-- Iconos de selección rápida (4 Departamentos Principales) -->
                 <label>Selección rápida por Departamento:</label>
                 <div class="dept-quick-icons">
                     <button type="button" class="dept-pill" data-dpto="Salud" onclick="seleccionarDptoRapido('Salud')">
@@ -662,7 +646,6 @@
                     </button>
                 </div>
 
-                <!-- Menús desplegables con gadgets -->
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="departamento">Departamento Destino *:</label>
@@ -746,7 +729,7 @@
         </div>
     </div>
 
-    <!-- MÓDULO 2: PRIMERA VEZ (CONSULTA) -->
+    <!-- MÓDULO 2: PRIMERA VEZ -->
     <div id="modulo-primera" class="module-content">
         <div class="card">
             <div class="action-bar">
@@ -774,7 +757,7 @@
         </div>
     </div>
 
-    <!-- MÓDULO 3: FRECUENTES (CONSULTA) -->
+    <!-- MÓDULO 3: FRECUENTES -->
     <div id="modulo-frecuente" class="module-content">
         <div class="card">
             <div class="action-bar">
@@ -802,7 +785,7 @@
         </div>
     </div>
 
-    <!-- MÓDULO 4: DEPARTAMENTOS (CONSULTA) -->
+    <!-- MÓDULO 4: DEPARTAMENTOS -->
     <div id="modulo-departamento" class="module-content">
         <div class="card">
             <h2>Consulta por Departamento y Servicio</h2>
@@ -1340,7 +1323,7 @@
             id: Number(id),
             tipo: document.getElementById('edit-tipo').value,
             nombreRep: document.getElementById('edit-nombreRep').value.trim(),
-            cedulaRep: document.getElementById('edit-cedulaRep').value.trim(),
+            cedulaRep: document.getElementById('cedulaRep').value.trim(),
             telefonoRep: document.getElementById('telefonoRep').value.trim() || 'N/A',
             direccionRep: document.getElementById('direccionRep').value.trim() || 'N/A',
             nombreNNA: document.getElementById('nombreNNA').value.trim() || 'N/A',
@@ -1523,7 +1506,7 @@
         return registros.filter(r => r.tipo === tipo);
     }
 
-    // --- TABLAS DE CONSULTA (SIN BOTONES DE ACCIÓN) ---
+    // --- TABLAS DE CONSULTA LIMPIAS (SIN BOTONES DE ACCIÓN) ---
     function actualizarModuloPrimeraVez() {
         const lista = obtenerRegistrosPorTipo('Primera Vez');
         document.getElementById('cnt-primera').textContent = lista.length;

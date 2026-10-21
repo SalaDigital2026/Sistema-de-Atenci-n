@@ -105,7 +105,6 @@ export default {
     // --- 3. ATENCIONES (GET, POST, PUT, DELETE) ---
     if (url.pathname === "/api/registros") {
       try {
-        // LEER REGISTROS
         if (request.method === "GET") {
           const { results } = await env.DB.prepare("SELECT * FROM registros ORDER BY id DESC").all();
           return new Response(JSON.stringify(results), {
@@ -113,7 +112,6 @@ export default {
           });
         }
 
-        // CREAR REGISTRO
         if (request.method === "POST") {
           const r = await request.json();
           const res = await env.DB.prepare(`
@@ -131,7 +129,6 @@ export default {
           });
         }
 
-        // ACTUALIZAR / EDITAR REGISTRO (NUEVO)
         if (request.method === "PUT") {
           const r = await request.json();
           await env.DB.prepare(`
@@ -149,7 +146,6 @@ export default {
           });
         }
 
-        // ELIMINAR REGISTRO
         if (request.method === "DELETE") {
           const id = url.searchParams.get("id");
           if (!id) return new Response(JSON.stringify({ error: "ID requerido" }), { status: 400, headers: corsHeaders });
@@ -164,6 +160,17 @@ export default {
       }
     }
 
-    return env.ASSETS.fetch(request);
+    // --- 4. ASSETS ESTÁTICOS CON CONTROL ANTI-CACHÉ ---
+    const assetResponse = await env.ASSETS.fetch(request);
+    const responseHeaders = new Headers(assetResponse.headers);
+    responseHeaders.set("Cache-Control", "no-cache, no-store, must-revalidate");
+    responseHeaders.set("Pragma", "no-cache");
+    responseHeaders.set("Expires", "0");
+
+    return new Response(assetResponse.body, {
+      status: assetResponse.status,
+      statusText: assetResponse.statusText,
+      headers: responseHeaders
+    });
   }
 };
