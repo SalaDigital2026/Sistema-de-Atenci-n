@@ -216,7 +216,7 @@
         }
         input:focus { border-color: var(--accent); }
 
-        /* --- ICONOS DE SELECCIÓN RÁPIDA DE DEPARTAMENTO --- */
+        /* --- SELECCIÓN RÁPIDA --- */
         .dept-quick-icons {
             display: flex;
             flex-wrap: wrap;
@@ -239,16 +239,8 @@
             transition: all 0.2s;
         }
 
-        .dept-pill:hover {
-            background: #e2e8f0;
-            border-color: var(--accent);
-        }
-
-        .dept-pill.active {
-            background: #eff6ff;
-            border-color: var(--accent);
-            color: var(--accent);
-        }
+        .dept-pill:hover { background: #e2e8f0; border-color: var(--accent); }
+        .dept-pill.active { background: #eff6ff; border-color: var(--accent); color: var(--accent); }
 
         /* --- GADGET DE SELECCIÓN CON FLECHA --- */
         .select-gadget {
@@ -312,7 +304,7 @@
             color: #94a3b8;
         }
 
-        /* --- BANDEJA DE SERVICIOS MÚLTIPLES --- */
+        /* --- BANDEJA MULTISERVICIOS --- */
         .servicios-multiples-box {
             background: #eff6ff;
             border: 2px dashed #93c5fd;
@@ -331,11 +323,7 @@
             margin-bottom: 10px;
         }
 
-        .chips-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
+        .chips-container { display: flex; flex-wrap: wrap; gap: 8px; }
 
         .service-chip {
             background: white;
@@ -379,10 +367,7 @@
             font-size: 14px;
             font-weight: bold;
             line-height: 1;
-            transition: background 0.2s;
         }
-
-        .chip-remove:hover { background: #fca5a5; }
 
         .btn-add-more {
             background: #0284c7;
@@ -396,7 +381,6 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            transition: background 0.2s;
         }
         .btn-add-more:hover { background: #0369a1; }
 
@@ -438,7 +422,13 @@
         .btn-excel { background: #16a34a; }
         .btn-excel:hover { background: #15803d; }
         .btn-import { background: #0284c7; }
-        .btn-danger { background: #ef4444; padding: 6px 10px; font-size: 12px; border-radius: 6px; }
+        
+        /* Botones de acción en tablas */
+        .btn-actions { display: inline-flex; gap: 6px; }
+        .btn-warning { background: #f59e0b; color: white; padding: 6px 10px; font-size: 12px; border-radius: 6px; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-danger { background: #ef4444; color: white; padding: 6px 10px; font-size: 12px; border-radius: 6px; }
+        .btn-danger:hover { background: #dc2626; }
 
         .table-container { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
@@ -453,11 +443,54 @@
         .btn-group { display: flex; gap: 10px; }
         .counter-badge { background: var(--accent); color: white; border-radius: 10px; padding: 2px 8px; font-size: 12px; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 24px; }
         .stat-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
         .stat-card.total-card { background: #eff6ff; border-color: #bfdbfe; }
         .stat-number { font-size: 28px; font-weight: 700; color: var(--accent); margin: 8px 0 4px 0; }
         .stat-label { font-size: 13px; color: #64748b; font-weight: 600; }
+
+        /* --- VENTANA MODAL PARA EDITAR --- */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 14px;
+            max-width: 750px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h3 { margin: 0; color: var(--primary); display: flex; align-items: center; gap: 8px; }
+
+        .btn-close-modal {
+            background: transparent;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #64748b;
+        }
     </style>
 </head>
 <body>
@@ -601,7 +634,7 @@
                     </div>
                     <div class="form-group">
                         <label for="fechaNacNNA">Fecha de Nacimiento:</label>
-                        <input type="date" id="fechaNacNNA" onchange="calcularEdadDesdeFecha()">
+                        <input type="date" id="fechaNacNNA" onchange="calcularEdadDesdeFecha('fechaNacNNA', 'edadNNA')">
                     </div>
                     <div class="form-group">
                         <label for="edadNNA">Edad (Calculada):</label>
@@ -609,7 +642,7 @@
                     </div>
                 </div>
 
-                <!-- ATENCIÓN REQUERIDA (SELECCIÓN SIMPLE O MÚLTIPLE CON ICONOS) -->
+                <!-- ATENCIÓN REQUERIDA (CON PEDIATRÍA) -->
                 <div class="section-title">Atención Requerida (Puede seleccionar uno o más departamentos)</div>
 
                 <!-- Iconos de selección rápida -->
@@ -617,6 +650,9 @@
                 <div class="dept-quick-icons">
                     <button type="button" class="dept-pill" data-dpto="Salud" onclick="seleccionarDptoRapido('Salud')">
                         <i data-lucide="activity"></i> Salud
+                    </button>
+                    <button type="button" class="dept-pill" data-dpto="Pediatría" onclick="seleccionarDptoRapido('Pediatría')">
+                        <i data-lucide="baby"></i> Pediatría
                     </button>
                     <button type="button" class="dept-pill" data-dpto="Defensoría" onclick="seleccionarDptoRapido('Defensoría')">
                         <i data-lucide="shield"></i> Defensoría
@@ -637,13 +673,12 @@
                             <select id="departamento" onchange="actualizarServicios('departamento', 'servicio')">
                                 <option value="">-- Seleccionar Departamento --</option>
                                 <option value="Salud">Salud</option>
+                                <option value="Pediatría">Pediatría</option>
                                 <option value="Defensoría">Defensoría</option>
                                 <option value="Orientación Familiar">Orientación Familiar</option>
                                 <option value="Atención">Atención</option>
                             </select>
-                            <div class="gadget-arrow">
-                                <i data-lucide="chevron-down"></i>
-                            </div>
+                            <div class="gadget-arrow"><i data-lucide="chevron-down"></i></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -652,14 +687,11 @@
                             <select id="servicio" disabled>
                                 <option value="">-- Seleccione Departamento --</option>
                             </select>
-                            <div class="gadget-arrow">
-                                <i data-lucide="chevron-down"></i>
-                            </div>
+                            <div class="gadget-arrow"><i data-lucide="chevron-down"></i></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Botón para añadir múltiples servicios a la misma persona -->
                 <div style="margin-bottom: 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                     <button type="button" class="btn-add-more" onclick="agregarServicioALista()">
                         <i data-lucide="plus-circle"></i> + Añadir a la visita
@@ -667,7 +699,6 @@
                     <small style="color: #64748b;">(Úsalo si la persona va a más de un departamento o servicio en esta visita)</small>
                 </div>
 
-                <!-- Bandeja de servicios acumulados -->
                 <div id="contenedor-servicios-multiples" class="servicios-multiples-box" style="display: none;">
                     <div class="servicios-multiples-title">
                         <i data-lucide="list-checks"></i> Departamentos y Servicios seleccionados para esta visita:
@@ -675,7 +706,6 @@
                     <div id="lista-chips-servicios" class="chips-container"></div>
                 </div>
 
-                <!-- BOTÓN GUARDAR -->
                 <button type="submit" class="btn">
                     <i data-lucide="save"></i> GUARDAR
                 </button>
@@ -711,7 +741,7 @@
                             <th>Cédula NNA</th>
                             <th>Departamento</th>
                             <th>Servicio</th>
-                            <th>Acción</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="cuerpoTablaGeneral"></tbody>
@@ -740,6 +770,7 @@
                             <th>NNA</th>
                             <th>Departamento</th>
                             <th>Servicio</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="cuerpoTablaPrimera"></tbody>
@@ -768,6 +799,7 @@
                             <th>NNA</th>
                             <th>Departamento</th>
                             <th>Servicio</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="cuerpoTablaFrecuente"></tbody>
@@ -787,13 +819,12 @@
                         <select id="filtroDpto" onchange="actualizarFiltroServicios()">
                             <option value="">-- Todos los Departamentos --</option>
                             <option value="Salud">Salud</option>
+                            <option value="Pediatría">Pediatría</option>
                             <option value="Defensoría">Defensoría</option>
                             <option value="Orientación Familiar">Orientación Familiar</option>
                             <option value="Atención">Atención</option>
                         </select>
-                        <div class="gadget-arrow">
-                            <i data-lucide="chevron-down"></i>
-                        </div>
+                        <div class="gadget-arrow"><i data-lucide="chevron-down"></i></div>
                     </div>
                 </div>
                 <div class="form-group">
@@ -802,9 +833,7 @@
                         <select id="filtroServicio" onchange="filtrarPorDepartamentoServicio()" disabled>
                             <option value="">-- Todos los Servicios --</option>
                         </select>
-                        <div class="gadget-arrow">
-                            <i data-lucide="chevron-down"></i>
-                        </div>
+                        <div class="gadget-arrow"><i data-lucide="chevron-down"></i></div>
                     </div>
                 </div>
             </div>
@@ -820,6 +849,7 @@
                             <th>NNA</th>
                             <th>Departamento</th>
                             <th>Servicio</th>
+                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="cuerpoTablaDepartamento"></tbody>
@@ -842,6 +872,10 @@
                 <div class="stat-card">
                     <div class="stat-label">Salud</div>
                     <div class="stat-number" id="cnt-dpto-salud">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pediatría</div>
+                    <div class="stat-number" id="cnt-dpto-pediatria">0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Defensoría</div>
@@ -879,10 +913,113 @@
     </div>
 </div>
 
+<!-- VENTANA MODAL PARA EDITAR REGISTRO -->
+<div id="modal-editar" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3><i data-lucide="edit-3"></i> Editar Registro de Atención</h3>
+            <button class="btn-close-modal" onclick="cerrarModalEditar()">&times;</button>
+        </div>
+        <form id="formEditar" onsubmit="guardarEdicion(event)">
+            <input type="hidden" id="edit-id">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Tipo de Atención:</label>
+                    <div class="select-gadget">
+                        <select id="edit-tipo" required>
+                            <option value="Primera Vez">Primera Vez</option>
+                            <option value="Frecuente">Frecuente</option>
+                        </select>
+                        <div class="gadget-arrow"><i data-lucide="chevron-down"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">Datos del Representante</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Cédula Rep. *:</label>
+                    <input type="text" id="edit-cedulaRep" required>
+                </div>
+                <div class="form-group">
+                    <label>Nombre Rep. *:</label>
+                    <input type="text" id="edit-nombreRep" required>
+                </div>
+                <div class="form-group">
+                    <label>Teléfono:</label>
+                    <input type="tel" id="edit-telefonoRep">
+                </div>
+                <div class="form-group">
+                    <label>Dirección:</label>
+                    <input type="text" id="edit-direccionRep">
+                </div>
+            </div>
+
+            <div class="section-title">Datos del NNA</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Cédula NNA:</label>
+                    <input type="text" id="edit-cedulaNNA">
+                </div>
+                <div class="form-group">
+                    <label>Nombre NNA:</label>
+                    <input type="text" id="edit-nombreNNA">
+                </div>
+                <div class="form-group">
+                    <label>Fecha Nacimiento:</label>
+                    <input type="date" id="edit-fechaNacNNA" onchange="calcularEdadDesdeFecha('edit-fechaNacNNA', 'edit-edadNNA')">
+                </div>
+                <div class="form-group">
+                    <label>Edad:</label>
+                    <input type="number" id="edit-edadNNA" min="0" max="17">
+                </div>
+            </div>
+
+            <div class="section-title">Atención Requerida</div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Departamento *:</label>
+                    <div class="select-gadget">
+                        <select id="edit-departamento" required onchange="actualizarServicios('edit-departamento', 'edit-servicio')">
+                            <option value="Salud">Salud</option>
+                            <option value="Pediatría">Pediatría</option>
+                            <option value="Defensoría">Defensoría</option>
+                            <option value="Orientación Familiar">Orientación Familiar</option>
+                            <option value="Atención">Atención</option>
+                        </select>
+                        <div class="gadget-arrow"><i data-lucide="chevron-down"></i></div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Servicio *:</label>
+                    <div class="select-gadget">
+                        <select id="edit-servicio" required>
+                            <option value="">-- Seleccionar Servicio --</option>
+                        </select>
+                        <div class="gadget-arrow"><i data-lucide="chevron-down"></i></div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" class="btn" style="background: #64748b;" onclick="cerrarModalEditar()">Cancelar</button>
+                <button type="submit" class="btn"><i data-lucide="save"></i> Guardar Cambios</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
-    // --- ESTRUCTURA ACTUALIZADA CON "Escuela para Padres" ---
+    // --- SERVICIOS CON PEDIATRÍA INCLUIDO ---
     const serviciosPorDepartamento = {
         "Salud": ["Odontología", "Medicina General", "Nutrición"],
+        "Pediatría": [
+            "Consulta Pediátrica",
+            "Control de Crecimiento y Desarrollo",
+            "Inmunización / Vacunación",
+            "Nutrición Pediátrica"
+        ],
         "Defensoría": [
             "Remisiones", "Documento Público", "Incumplimiento de Deberes",
             "Manutención", "Presentación Extrahospitalaria", "Presentación Extemporánea",
@@ -894,6 +1031,7 @@
 
     const iconosPorDepartamento = {
         "Salud": "activity",
+        "Pediatría": "baby",
         "Defensoría": "shield",
         "Orientación Familiar": "users",
         "Atención": "info"
@@ -933,7 +1071,6 @@
         serviciosSeleccionadosVisita.push({ departamento: dpto, servicio: serv });
         renderizarChipsServicios();
 
-        // Limpiar para permitir elegir otro departamento si lo desea
         document.getElementById('departamento').value = '';
         actualizarServicios('departamento', 'servicio');
         document.querySelectorAll('.dept-pill').forEach(btn => btn.classList.remove('active'));
@@ -1102,7 +1239,7 @@
         }
     }
 
-    // --- GUARDAR ATENCIÓN (SOPORTA 1 O MÚLTIPLES SERVICIOS) ---
+    // --- GUARDAR ATENCIÓN NUEVA ---
     document.getElementById('registroForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
@@ -1185,28 +1322,107 @@
         }
     });
 
-    async function eliminarRegistro(id, index) {
-        if (!confirm('¿Desea eliminar este registro permanentemente?')) return;
+    // --- EDICIÓN DE REGISTROS (MODAL) ---
+    function abrirModalEditar(id) {
+        const r = registros.find(item => item.id == id);
+        if (!r) return;
+
+        document.getElementById('edit-id').value = r.id;
+        document.getElementById('edit-tipo').value = r.tipo;
+
+        document.getElementById('edit-cedulaRep').value = r.cedulaRep;
+        document.getElementById('edit-nombreRep').value = r.nombreRep;
+        document.getElementById('edit-telefonoRep').value = r.telefonoRep !== 'N/A' ? r.telefonoRep : '';
+        document.getElementById('edit-direccionRep').value = r.direccionRep !== 'N/A' ? r.direccionRep : '';
+
+        document.getElementById('edit-cedulaNNA').value = r.cedulaNNA !== 'N/A' ? r.cedulaNNA : '';
+        document.getElementById('edit-nombreNNA').value = r.nombreNNA !== 'N/A' ? r.nombreNNA : '';
+        document.getElementById('edit-fechaNacNNA').value = r.fechaNacNNA !== 'N/A' ? r.fechaNacNNA : '';
+        document.getElementById('edit-edadNNA').value = r.edadNNA !== 'N/A' ? r.edadNNA : '';
+
+        document.getElementById('edit-departamento').value = r.departamento;
+        actualizarServicios('edit-departamento', 'edit-servicio');
+        document.getElementById('edit-servicio').value = r.servicio;
+
+        document.getElementById('modal-editar').style.display = 'flex';
+        lucide.createIcons();
+    }
+
+    function cerrarModalEditar() {
+        document.getElementById('modal-editar').style.display = 'none';
+    }
+
+    async function guardarEdicion(event) {
+        event.preventDefault();
+        const id = document.getElementById('edit-id').value;
+
+        const editado = {
+            id: Number(id),
+            tipo: document.getElementById('edit-tipo').value,
+            nombreRep: document.getElementById('edit-nombreRep').value.trim(),
+            cedulaRep: document.getElementById('edit-cedulaRep').value.trim(),
+            telefonoRep: document.getElementById('edit-telefonoRep').value.trim() || 'N/A',
+            direccionRep: document.getElementById('edit-direccionRep').value.trim() || 'N/A',
+            nombreNNA: document.getElementById('edit-nombreNNA').value.trim() || 'N/A',
+            edadNNA: document.getElementById('edit-edadNNA').value.trim() || 'N/A',
+            fechaNacNNA: document.getElementById('edit-fechaNacNNA').value || 'N/A',
+            cedulaNNA: document.getElementById('edit-cedulaNNA').value.trim() || 'N/A',
+            departamento: document.getElementById('edit-departamento').value,
+            servicio: document.getElementById('edit-servicio').value
+        };
+
+        try {
+            const res = await fetch('/api/registros', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(editado)
+            });
+
+            if (res.ok) {
+                const idx = registros.findIndex(item => item.id == id);
+                if (idx !== -1) {
+                    registros[idx] = { ...registros[idx], ...editado };
+                }
+                actualizarTodasLasTablas();
+                cerrarModalEditar();
+                alert('¡Registro actualizado exitosamente en Cloudflare D1!');
+            } else {
+                alert('No se pudo actualizar el registro.');
+            }
+        } catch (err) {
+            alert('Error al conectar con la base de datos.');
+        }
+    }
+
+    // --- ELIMINAR REGISTRO ---
+    async function eliminarRegistro(id) {
+        if (!confirm('¿Desea eliminar este registro permanentemente de la base de datos?')) return;
 
         try {
             const res = await fetch(`/api/registros?id=${id}`, { method: 'DELETE' });
             if (res.ok) {
-                registros.splice(index, 1);
+                registros = registros.filter(r => r.id != id);
                 actualizarTodasLasTablas();
+                alert('Registro eliminado correctamente.');
+            } else {
+                alert('No se pudo eliminar el registro.');
             }
         } catch (err) {
-            alert('No se pudo eliminar el registro.');
+            alert('Error de conexión al eliminar.');
         }
     }
 
-    function calcularEdadDesdeFecha() {
-        const fechaNac = new Date(document.getElementById('fechaNacNNA').value);
+    // --- UTILIDADES ---
+    function calcularEdadDesdeFecha(inputId, outputId) {
+        const val = document.getElementById(inputId).value;
+        if (!val) return;
+        const fechaNac = new Date(val);
         if (isNaN(fechaNac)) return;
         const hoy = new Date();
         let edad = hoy.getFullYear() - fechaNac.getFullYear();
         const m = hoy.getMonth() - fechaNac.getMonth();
         if (m < 0 || (m === 0 && hoy.getDate() < fechaNac.getDate())) edad--;
-        document.getElementById('edadNNA').value = edad >= 0 ? edad : 0;
+        document.getElementById(outputId).value = edad >= 0 ? edad : 0;
     }
 
     function buscarCiudadano() {
@@ -1236,7 +1452,7 @@
             document.getElementById('nombreNNA').value = found.nombreNNA !== 'N/A' ? found.nombreNNA : '';
             if (found.fechaNacNNA && found.fechaNacNNA !== 'N/A') {
                 document.getElementById('fechaNacNNA').value = found.fechaNacNNA;
-                calcularEdadDesdeFecha();
+                calcularEdadDesdeFecha('fechaNacNNA', 'edadNNA');
             } else if (found.edadNNA && found.edadNNA !== 'N/A') {
                 document.getElementById('edadNNA').value = found.edadNNA;
             }
@@ -1290,10 +1506,23 @@
         actualizarModuloConteo();
     }
 
+    function renderBotonesAccion(id) {
+        return `
+            <div class="btn-actions">
+                <button class="btn btn-warning" onclick="abrirModalEditar(${id})" title="Editar Registro">
+                    <i data-lucide="edit-3"></i>
+                </button>
+                <button class="btn btn-danger" onclick="eliminarRegistro(${id})" title="Eliminar Registro">
+                    <i data-lucide="trash-2"></i>
+                </button>
+            </div>
+        `;
+    }
+
     function actualizarTablaGeneral() {
         const tbody = document.getElementById('cuerpoTablaGeneral');
         tbody.innerHTML = '';
-        registros.forEach((r, idx) => {
+        registros.forEach(r => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td>${r.fecha}</td>
@@ -1306,11 +1535,7 @@
                 <td>${r.cedulaNNA}</td>
                 <td>${r.departamento}</td>
                 <td>${r.servicio}</td>
-                <td>
-                    <button class="btn btn-danger" onclick="eliminarRegistro(${r.id}, ${idx})">
-                        <i data-lucide="trash-2"></i>
-                    </button>
-                </td>
+                <td>${renderBotonesAccion(r.id)}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -1329,8 +1554,10 @@
             <tr>
                 <td>${r.fecha}</td><td>${r.nombreRep}</td><td>${r.cedulaRep}</td>
                 <td>${r.telefonoRep}</td><td>${r.nombreNNA}</td><td>${r.departamento}</td><td>${r.servicio}</td>
+                <td>${renderBotonesAccion(r.id)}</td>
             </tr>
         `).join('');
+        lucide.createIcons();
     }
 
     function actualizarModuloFrecuentes() {
@@ -1341,8 +1568,10 @@
             <tr>
                 <td>${r.fecha}</td><td>${r.nombreRep}</td><td>${r.cedulaRep}</td>
                 <td>${r.telefonoRep}</td><td>${r.nombreNNA}</td><td>${r.departamento}</td><td>${r.servicio}</td>
+                <td>${renderBotonesAccion(r.id)}</td>
             </tr>
         `).join('');
+        lucide.createIcons();
     }
 
     function actualizarFiltroServicios() {
@@ -1360,15 +1589,18 @@
                 <td>${r.fecha}</td>
                 <td><span class="badge ${r.tipo === 'Primera Vez' ? 'badge-primera' : 'badge-frecuente'}">${r.tipo}</span></td>
                 <td>${r.nombreRep}</td><td>${r.cedulaRep}</td><td>${r.nombreNNA}</td><td>${r.departamento}</td><td>${r.servicio}</td>
+                <td>${renderBotonesAccion(r.id)}</td>
             </tr>
         `).join('');
+        lucide.createIcons();
     }
 
     function actualizarModuloConteo() {
-        let counts = { Salud: 0, Defensoría: 0, 'Orientación Familiar': 0, Atención: 0 };
+        let counts = { Salud: 0, Pediatría: 0, Defensoría: 0, 'Orientación Familiar': 0, Atención: 0 };
         registros.forEach(r => { if (counts[r.departamento] !== undefined) counts[r.departamento]++; });
 
         document.getElementById('cnt-dpto-salud').textContent = counts['Salud'];
+        document.getElementById('cnt-dpto-pediatria').textContent = counts['Pediatría'];
         document.getElementById('cnt-dpto-defensoria').textContent = counts['Defensoría'];
         document.getElementById('cnt-dpto-orientacion').textContent = counts['Orientación Familiar'];
         document.getElementById('cnt-dpto-atencion').textContent = counts['Atención'];

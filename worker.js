@@ -2,10 +2,9 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Cabeceras CORS
     const corsHeaders = {
       "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+      "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
       "Access-Control-Allow-Headers": "Content-Type",
     };
 
@@ -13,7 +12,7 @@ export default {
       return new Response(null, { headers: corsHeaders });
     }
 
-    // --- 1. ENDPOINT PARA CREAR LAS TABLAS EN D1 ---
+    // --- 1. SETUP DE TABLAS ---
     if (url.pathname === "/api/setup") {
       try {
         await env.DB.prepare(`
@@ -58,7 +57,7 @@ export default {
       }
     }
 
-    // --- 2. ENDPOINT DE AUTENTICACIÓN (LOGIN Y REGISTRO) ---
+    // --- 2. AUTH (LOGIN / REGISTRO) ---
     if (url.pathname === "/api/auth" && request.method === "POST") {
       try {
         const body = await request.json();
@@ -103,9 +102,10 @@ export default {
       }
     }
 
-    // --- 3. ENDPOINT DE ATENCIONES (GET, POST, DELETE) ---
+    // --- 3. ATENCIONES (GET, POST, PUT, DELETE) ---
     if (url.pathname === "/api/registros") {
       try {
+        // LEER REGISTROS
         if (request.method === "GET") {
           const { results } = await env.DB.prepare("SELECT * FROM registros ORDER BY id DESC").all();
           return new Response(JSON.stringify(results), {
@@ -113,6 +113,7 @@ export default {
           });
         }
 
+        // CREAR REGISTRO
         if (request.method === "POST") {
           const r = await request.json();
           const res = await env.DB.prepare(`
@@ -130,6 +131,25 @@ export default {
           });
         }
 
+        // ACTUALIZAR / EDITAR REGISTRO (NUEVO)
+        if (request.method === "PUT") {
+          const r = await request.json();
+          await env.DB.prepare(`
+            UPDATE registros SET
+              tipo = ?, nombreRep = ?, cedulaRep = ?, telefonoRep = ?, direccionRep = ?,
+              nombreNNA = ?, edadNNA = ?, fechaNacNNA = ?, cedulaNNA = ?, departamento = ?, servicio = ?
+            WHERE id = ?
+          `).bind(
+            r.tipo, r.nombreRep, r.cedulaRep, r.telefonoRep, r.direccionRep,
+            r.nombreNNA, r.edadNNA, r.fechaNacNNA, r.cedulaNNA, r.departamento, r.servicio, r.id
+          ).run();
+
+          return new Response(JSON.stringify({ success: true }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" }
+          });
+        }
+
+        // ELIMINAR REGISTRO
         if (request.method === "DELETE") {
           const id = url.searchParams.get("id");
           if (!id) return new Response(JSON.stringify({ error: "ID requerido" }), { status: 400, headers: corsHeaders });
@@ -144,7 +164,6 @@ export default {
       }
     }
 
-    // --- 4. SI NO ES UNA RUTA API, SERVIR EL ARCHIVO HTML ---
     return env.ASSETS.fetch(request);
   }
 };
