@@ -423,11 +423,11 @@
         .btn-excel:hover { background: #15803d; }
         .btn-import { background: #0284c7; }
         
-        /* Botones de acción en tablas */
+        /* Botones de acción específicos para el historial */
         .btn-actions { display: inline-flex; gap: 6px; }
-        .btn-warning { background: #f59e0b; color: white; padding: 6px 10px; font-size: 12px; border-radius: 6px; }
+        .btn-warning { background: #f59e0b; color: white; padding: 6px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; }
         .btn-warning:hover { background: #d97706; }
-        .btn-danger { background: #ef4444; color: white; padding: 6px 10px; font-size: 12px; border-radius: 6px; }
+        .btn-danger { background: #ef4444; color: white; padding: 6px 10px; font-size: 12px; border-radius: 6px; border: none; cursor: pointer; }
         .btn-danger:hover { background: #dc2626; }
 
         .table-container { overflow-x: auto; }
@@ -443,7 +443,7 @@
         .btn-group { display: flex; gap: 10px; }
         .counter-badge { background: var(--accent); color: white; border-radius: 10px; padding: 2px 8px; font-size: 12px; }
 
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px; }
         .stat-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 10px; padding: 16px; text-align: center; }
         .stat-card.total-card { background: #eff6ff; border-color: #bfdbfe; }
         .stat-number { font-size: 28px; font-weight: 700; color: var(--accent); margin: 8px 0 4px 0; }
@@ -583,7 +583,7 @@
         </button>
     </div>
 
-    <!-- MÓDULO 1: REGISTRO -->
+    <!-- MÓDULO 1: REGISTRO (CON HISTÓRICO Y ACCIONES) -->
     <div id="modulo-registro" class="module-content active">
         <div class="card">
             <h2>Registro de Atención del Ciudadano</h2>
@@ -642,17 +642,14 @@
                     </div>
                 </div>
 
-                <!-- ATENCIÓN REQUERIDA (CON PEDIATRÍA) -->
+                <!-- ATENCIÓN REQUERIDA -->
                 <div class="section-title">Atención Requerida (Puede seleccionar uno o más departamentos)</div>
 
-                <!-- Iconos de selección rápida -->
+                <!-- Iconos de selección rápida (4 Departamentos Principales) -->
                 <label>Selección rápida por Departamento:</label>
                 <div class="dept-quick-icons">
                     <button type="button" class="dept-pill" data-dpto="Salud" onclick="seleccionarDptoRapido('Salud')">
                         <i data-lucide="activity"></i> Salud
-                    </button>
-                    <button type="button" class="dept-pill" data-dpto="Pediatría" onclick="seleccionarDptoRapido('Pediatría')">
-                        <i data-lucide="baby"></i> Pediatría
                     </button>
                     <button type="button" class="dept-pill" data-dpto="Defensoría" onclick="seleccionarDptoRapido('Defensoría')">
                         <i data-lucide="shield"></i> Defensoría
@@ -673,7 +670,6 @@
                             <select id="departamento" onchange="actualizarServicios('departamento', 'servicio')">
                                 <option value="">-- Seleccionar Departamento --</option>
                                 <option value="Salud">Salud</option>
-                                <option value="Pediatría">Pediatría</option>
                                 <option value="Defensoría">Defensoría</option>
                                 <option value="Orientación Familiar">Orientación Familiar</option>
                                 <option value="Atención">Atención</option>
@@ -712,7 +708,7 @@
             </form>
         </div>
 
-        <!-- Tabla General -->
+        <!-- Tabla General (HISTORIAL DE REGISTROS CON BOTONES EDITAR Y ELIMINAR) -->
         <div class="card">
             <div class="action-bar">
                 <h2>Histórico General de Atenciones</h2>
@@ -750,7 +746,7 @@
         </div>
     </div>
 
-    <!-- MÓDULO 2: PRIMERA VEZ -->
+    <!-- MÓDULO 2: PRIMERA VEZ (CONSULTA) -->
     <div id="modulo-primera" class="module-content">
         <div class="card">
             <div class="action-bar">
@@ -770,7 +766,6 @@
                             <th>NNA</th>
                             <th>Departamento</th>
                             <th>Servicio</th>
-                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="cuerpoTablaPrimera"></tbody>
@@ -779,7 +774,7 @@
         </div>
     </div>
 
-    <!-- MÓDULO 3: FRECUENTES -->
+    <!-- MÓDULO 3: FRECUENTES (CONSULTA) -->
     <div id="modulo-frecuente" class="module-content">
         <div class="card">
             <div class="action-bar">
@@ -799,7 +794,6 @@
                             <th>NNA</th>
                             <th>Departamento</th>
                             <th>Servicio</th>
-                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="cuerpoTablaFrecuente"></tbody>
@@ -808,7 +802,7 @@
         </div>
     </div>
 
-    <!-- MÓDULO 4: DEPARTAMENTOS -->
+    <!-- MÓDULO 4: DEPARTAMENTOS (CONSULTA) -->
     <div id="modulo-departamento" class="module-content">
         <div class="card">
             <h2>Consulta por Departamento y Servicio</h2>
@@ -819,7 +813,6 @@
                         <select id="filtroDpto" onchange="actualizarFiltroServicios()">
                             <option value="">-- Todos los Departamentos --</option>
                             <option value="Salud">Salud</option>
-                            <option value="Pediatría">Pediatría</option>
                             <option value="Defensoría">Defensoría</option>
                             <option value="Orientación Familiar">Orientación Familiar</option>
                             <option value="Atención">Atención</option>
@@ -849,7 +842,6 @@
                             <th>NNA</th>
                             <th>Departamento</th>
                             <th>Servicio</th>
-                            <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="cuerpoTablaDepartamento"></tbody>
@@ -872,10 +864,6 @@
                 <div class="stat-card">
                     <div class="stat-label">Salud</div>
                     <div class="stat-number" id="cnt-dpto-salud">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Pediatría</div>
-                    <div class="stat-number" id="cnt-dpto-pediatria">0</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Defensoría</div>
@@ -983,7 +971,6 @@
                     <div class="select-gadget">
                         <select id="edit-departamento" required onchange="actualizarServicios('edit-departamento', 'edit-servicio')">
                             <option value="Salud">Salud</option>
-                            <option value="Pediatría">Pediatría</option>
                             <option value="Defensoría">Defensoría</option>
                             <option value="Orientación Familiar">Orientación Familiar</option>
                             <option value="Atención">Atención</option>
@@ -1011,15 +998,9 @@
 </div>
 
 <script>
-    // --- SERVICIOS CON PEDIATRÍA INCLUIDO ---
+    // --- SERVICIOS CON PEDIATRÍA DENTRO DE SALUD ---
     const serviciosPorDepartamento = {
-        "Salud": ["Odontología", "Medicina General", "Nutrición"],
-        "Pediatría": [
-            "Consulta Pediátrica",
-            "Control de Crecimiento y Desarrollo",
-            "Inmunización / Vacunación",
-            "Nutrición Pediátrica"
-        ],
+        "Salud": ["Odontología", "Medicina General", "Nutrición", "Pediatría"],
         "Defensoría": [
             "Remisiones", "Documento Público", "Incumplimiento de Deberes",
             "Manutención", "Presentación Extrahospitalaria", "Presentación Extemporánea",
@@ -1031,7 +1012,6 @@
 
     const iconosPorDepartamento = {
         "Salud": "activity",
-        "Pediatría": "baby",
         "Defensoría": "shield",
         "Orientación Familiar": "users",
         "Atención": "info"
@@ -1322,7 +1302,7 @@
         }
     });
 
-    // --- EDICIÓN DE REGISTROS (MODAL) ---
+    // --- EDICIÓN DE REGISTROS (VENTANA MODAL) ---
     function abrirModalEditar(id) {
         const r = registros.find(item => item.id == id);
         if (!r) return;
@@ -1361,12 +1341,12 @@
             tipo: document.getElementById('edit-tipo').value,
             nombreRep: document.getElementById('edit-nombreRep').value.trim(),
             cedulaRep: document.getElementById('edit-cedulaRep').value.trim(),
-            telefonoRep: document.getElementById('edit-telefonoRep').value.trim() || 'N/A',
-            direccionRep: document.getElementById('edit-direccionRep').value.trim() || 'N/A',
-            nombreNNA: document.getElementById('edit-nombreNNA').value.trim() || 'N/A',
-            edadNNA: document.getElementById('edit-edadNNA').value.trim() || 'N/A',
-            fechaNacNNA: document.getElementById('edit-fechaNacNNA').value || 'N/A',
-            cedulaNNA: document.getElementById('edit-cedulaNNA').value.trim() || 'N/A',
+            telefonoRep: document.getElementById('telefonoRep').value.trim() || 'N/A',
+            direccionRep: document.getElementById('direccionRep').value.trim() || 'N/A',
+            nombreNNA: document.getElementById('nombreNNA').value.trim() || 'N/A',
+            edadNNA: document.getElementById('edadNNA').value.trim() || 'N/A',
+            fechaNacNNA: document.getElementById('fechaNacNNA').value || 'N/A',
+            cedulaNNA: document.getElementById('cedulaNNA').value.trim() || 'N/A',
             departamento: document.getElementById('edit-departamento').value,
             servicio: document.getElementById('edit-servicio').value
         };
@@ -1506,19 +1486,7 @@
         actualizarModuloConteo();
     }
 
-    function renderBotonesAccion(id) {
-        return `
-            <div class="btn-actions">
-                <button class="btn btn-warning" onclick="abrirModalEditar(${id})" title="Editar Registro">
-                    <i data-lucide="edit-3"></i>
-                </button>
-                <button class="btn btn-danger" onclick="eliminarRegistro(${id})" title="Eliminar Registro">
-                    <i data-lucide="trash-2"></i>
-                </button>
-            </div>
-        `;
-    }
-
+    // --- RENDERIZADO DEL HISTÓRICO GENERAL CON ACCIONES ---
     function actualizarTablaGeneral() {
         const tbody = document.getElementById('cuerpoTablaGeneral');
         tbody.innerHTML = '';
@@ -1535,7 +1503,16 @@
                 <td>${r.cedulaNNA}</td>
                 <td>${r.departamento}</td>
                 <td>${r.servicio}</td>
-                <td>${renderBotonesAccion(r.id)}</td>
+                <td>
+                    <div class="btn-actions">
+                        <button class="btn-warning" onclick="abrirModalEditar(${r.id})" title="Editar Registro">
+                            <i data-lucide="edit-3"></i>
+                        </button>
+                        <button class="btn-danger" onclick="eliminarRegistro(${r.id})" title="Eliminar Registro">
+                            <i data-lucide="trash-2"></i>
+                        </button>
+                    </div>
+                </td>
             `;
             tbody.appendChild(tr);
         });
@@ -1546,6 +1523,7 @@
         return registros.filter(r => r.tipo === tipo);
     }
 
+    // --- TABLAS DE CONSULTA (SIN BOTONES DE ACCIÓN) ---
     function actualizarModuloPrimeraVez() {
         const lista = obtenerRegistrosPorTipo('Primera Vez');
         document.getElementById('cnt-primera').textContent = lista.length;
@@ -1554,10 +1532,8 @@
             <tr>
                 <td>${r.fecha}</td><td>${r.nombreRep}</td><td>${r.cedulaRep}</td>
                 <td>${r.telefonoRep}</td><td>${r.nombreNNA}</td><td>${r.departamento}</td><td>${r.servicio}</td>
-                <td>${renderBotonesAccion(r.id)}</td>
             </tr>
         `).join('');
-        lucide.createIcons();
     }
 
     function actualizarModuloFrecuentes() {
@@ -1568,10 +1544,8 @@
             <tr>
                 <td>${r.fecha}</td><td>${r.nombreRep}</td><td>${r.cedulaRep}</td>
                 <td>${r.telefonoRep}</td><td>${r.nombreNNA}</td><td>${r.departamento}</td><td>${r.servicio}</td>
-                <td>${renderBotonesAccion(r.id)}</td>
             </tr>
         `).join('');
-        lucide.createIcons();
     }
 
     function actualizarFiltroServicios() {
@@ -1589,18 +1563,15 @@
                 <td>${r.fecha}</td>
                 <td><span class="badge ${r.tipo === 'Primera Vez' ? 'badge-primera' : 'badge-frecuente'}">${r.tipo}</span></td>
                 <td>${r.nombreRep}</td><td>${r.cedulaRep}</td><td>${r.nombreNNA}</td><td>${r.departamento}</td><td>${r.servicio}</td>
-                <td>${renderBotonesAccion(r.id)}</td>
             </tr>
         `).join('');
-        lucide.createIcons();
     }
 
     function actualizarModuloConteo() {
-        let counts = { Salud: 0, Pediatría: 0, Defensoría: 0, 'Orientación Familiar': 0, Atención: 0 };
+        let counts = { Salud: 0, Defensoría: 0, 'Orientación Familiar': 0, Atención: 0 };
         registros.forEach(r => { if (counts[r.departamento] !== undefined) counts[r.departamento]++; });
 
         document.getElementById('cnt-dpto-salud').textContent = counts['Salud'];
-        document.getElementById('cnt-dpto-pediatria').textContent = counts['Pediatría'];
         document.getElementById('cnt-dpto-defensoria').textContent = counts['Defensoría'];
         document.getElementById('cnt-dpto-orientacion').textContent = counts['Orientación Familiar'];
         document.getElementById('cnt-dpto-atencion').textContent = counts['Atención'];
